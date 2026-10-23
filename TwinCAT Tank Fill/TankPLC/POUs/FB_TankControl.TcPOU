@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_TankControl" Id="{df9f4825-9186-41f7-9f2e-6c7610063879}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TankControl
+VAR_INPUT
+	bSensHIGH, bSensLOW	: BOOL;
+	bEStop				: BOOL; //TRUE is pressed
+	bBusOK				: BOOL; //EtherCAT
+	
+	tFillTimeout		: TIME;
+END_VAR
+VAR_OUTPUT
+	bCmdValueIn			: BOOL;
+	bCmdValueOut		: BOOL;
+	bCmdPump			: BOOL;
+	eState				: E_TankState; 
+	bFault				: BOOL;
+	eFaultCode			: E_TankFault;
+END_VAR
+VAR_IN_OUT
+	HMI					: ST_TankHMI;
+END_VAR
+VAR
+	_eState, _ePrevState	: E_TankState;
+	_bFaultLatched		: BOOL;
+	_eFaultCode			: E_TankFault;
+	
+	_FillTimer, _DrainTimer, _MismatchTimer : TON;
+    _TrigStart, _TrigStop, _TrigReset       : R_TRIG;
+	
+	_bValveIn, _bValveOut, _bPump           : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// The State Machine
+
+// BODY
+// Edge-Detect Commands
+// Call Faults()
+// Select Mode
+	// Safe
+	// Auto
+	// Manual
+// Call Outputs()
+// Call HmiFeedback()
+
+// FAULTS
+
+// AUTO
+
+// MANUAL
+
+// SAFE
+
+// OUTPUTS
+
+// HMI FEEDBACK]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

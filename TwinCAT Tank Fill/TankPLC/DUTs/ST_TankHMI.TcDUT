@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="ST_TankHMI" Id="{56d26f25-9aac-45e8-97cf-a41d3db88d3d}">
+    <Declaration><![CDATA[TYPE ST_TankHMI :
+STRUCT
+    // ---- Commands (HMI -> PLC) ----
+    bAutoMode      : BOOL;
+    bStart         : BOOL;
+    bStop          : BOOL;
+    bReset         : BOOL;
+    bPB_ValveIn    : BOOL;
+    bPB_ValveOut   : BOOL;
+    bPB_Pump       : BOOL;
+
+    // ---- Status (PLC -> HMI) ----
+    bLampValveIn   : BOOL;
+    bLampValveOut  : BOOL;
+    bLampPump      : BOOL;
+    bLampHigh      : BOOL;
+    bLampLow       : BOOL;
+    bFaultActive   : BOOL;
+    eState         : E_TankState;
+    eFaultCode     : E_TankFault;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

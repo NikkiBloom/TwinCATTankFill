@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_HMI" Id="{c7b210ab-a444-40a9-a550-3710b73030bc}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+    Tank1 : ST_TankHMI;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

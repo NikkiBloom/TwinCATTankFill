@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="MAIN" Id="{c4315efa-39c9-470b-8c60-2c2ca0a0bcf4}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	// create instance of FB
+	Tank1 : FB_TankControl;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Main will just call function blocks in order
+
+// INPUT MAPING
+
+// HMI COMMAND HANDLING
+
+// FB CALLS
+
+// OUTPUT MAPING
+
+// STATUS AND DIAGNOSTICS
+// Things like heartbeat, warning flags, etc.]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

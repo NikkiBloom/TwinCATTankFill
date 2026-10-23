@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_IO" Id="{1d85f7da-8afe-45bb-ac53-4bc0ffe338b3}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	// IN
+	bSensHigh_RAW	AT %I* : BOOL;
+	bSensLow_RAW	AT %I* : BOOL;
+	bEStop_RAW		AT %I* : BOOL;
+	
+	// OUT
+	bValveIn		AT %Q* : BOOL;
+	bValveOut		AT %Q* : BOOL;
+	bPump			AT %Q* : BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

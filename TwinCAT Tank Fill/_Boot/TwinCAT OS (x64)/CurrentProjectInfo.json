@@ -1,0 +1,1 @@
+{"project":{"name":"TwinCAT Tank Fill","platform":"TwinCAT OS (x64)","created":"2026-10-23T11:18:34"},"components":[{"name":"TcIo","type":1},{"name":"TcPlc30","type":1},{"name":"TcRTime","type":1},{"name":"TcRtsObjects","type":1}],"references":[],"sub_projects":[{"name":"TankPLC","file":"Plc/Port_851.json"}]}

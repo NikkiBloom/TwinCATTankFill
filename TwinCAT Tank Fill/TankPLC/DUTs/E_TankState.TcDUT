@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="E_TankState" Id="{c7aa19b8-0e8e-4367-99ba-0307db0aec77}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_TankState :
+(
+	Idle	:= 0,
+	Filling := 1,
+	Full	:= 2,
+	Draining := 3,
+	Fault	:= 99
+) INT;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
