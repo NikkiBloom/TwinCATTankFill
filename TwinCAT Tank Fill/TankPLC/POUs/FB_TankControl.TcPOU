@@ -10,8 +10,8 @@ VAR_INPUT
 	tFillTimeout		: TIME;
 END_VAR
 VAR_OUTPUT
-	bCmdValueIn			: BOOL;
-	bCmdValueOut		: BOOL;
+	bCmdValveIn			: BOOL;
+	bCmdValveOut		: BOOL;
 	bCmdPump			: BOOL;
 	eState				: E_TankState; 
 	bFault				: BOOL;

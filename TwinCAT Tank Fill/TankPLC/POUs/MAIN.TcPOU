@@ -3,22 +3,78 @@
   <POU Name="MAIN" Id="{c4315efa-39c9-470b-8c60-2c2ca0a0bcf4}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
-	// create instance of FB
+	// Create instance of FB
 	Tank1 : FB_TankControl;
+	
+	// Internal Bools to handle I/O inputs
+	bEStopPressed 	: BOOL; // TRUE = PRESSED (inverted from raw)
+	bSensHIGH		: BOOL;
+	bSensLOW		: BOOL;
+	bBusOK			: BOOL := TRUE; // Practical IRL but unused in this simulation.
+	
+	// Timers
+	tTankfillTimeout	: TIME := T#120S; 
+	
+	// FB Outputs
+	bValveInCMD		: BOOL;
+	bValveOutCMD	: BOOL;
+	bPumpCMD		: BOOL;
+	bTankFault		: BOOL;
+	
+	eTankState		: E_TankState;
+	eTankFaultCode  : E_TankFault;
+	
+	// Plant-level
+	bOutputsDisabled : BOOL; // practical IRL for maitinence lockout, but unused in this simulation
+	fbHeartbeat		: TON;
+	bHeartbeat		: BOOL;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// Main will just call function blocks in order
+      <ST><![CDATA[// Main will primarily call function blocks in order
 
-// INPUT MAPING
+bEStopPressed := NOT GVL_IO.bEStop_RAW; // invert input;
 
 // HMI COMMAND HANDLING
+// This program was designed under the assumption that this MAIN may manage more than one tank.
+// As such, most of the IO is handled by the FB, and results passed in the next section.
 
-// FB CALLS
+// FB CALL
+Tank1(
+	// These go INTO the FB :=
+	bSensHIGH	:= bSensHIGH,
+	bSensLOW	:= bSensLOW,
+	bEStop		:= bEStopPressed,
+	bBusOK		:= bBusOK,
+	// These come OUT of the FB =>
+	bCmdValveIn		=> bValveInCMD,
+	bCmdValveOut 	=> bValveOutCMD,
+	bCmdPump		=> bPumpCMD,
+	eState			=> eTankState,
+	bFault			=> bTankFault,
+	eFaultCode		=> E_TankFault,
+	// Refer to...
+	HMI			:= GVL_HMI.Tank1
+);
 
 // OUTPUT MAPING
+// Plant-level overrides such as E-Stop presses, bus fault, etc. 
+// For this exercise, it's not simulated but still here.
+IF bOutputsDisabled OR NOT bBusOK OR bEStopPressed THEN // if something wrong, soft stop
+    GVL_IO.bValveIn  := FALSE;
+    GVL_IO.bValveOut := FALSE;
+    GVL_IO.bPump     := FALSE;
+ELSE 
+    GVL_IO.bValveIn  := bValveInCmd;
+    GVL_IO.bValveOut := bValveOutCmd;
+    GVL_IO.bPump     := bPumpCmd;
+END_IF;
 
 // STATUS AND DIAGNOSTICS
-// Things like heartbeat, warning flags, etc.]]></ST>
+// Things like heartbeat, warning flags, etc.
+fbHeartbeat(IN := NOT fbHeartbeat.Q, PT := T#500MS);
+IF fbHeartbeat.Q THEN
+    bHeartbeat := NOT bHeartbeat;
+END_IF;]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>
