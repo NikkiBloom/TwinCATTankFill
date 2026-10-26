@@ -32,11 +32,14 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Main will primarily call function blocks in order
 
-bEStopPressed := NOT GVL_IO.bEStop_RAW; // invert input;
+// Pull in I/O Inputs from GVL
+bEStopPressed 	:= NOT GVL_IO.bEStop_RAW; // invert input;
+bSensHIGH		:= GVL_IO.bSensHigh_RAW;
+bSensLOW		:= GVL_IO.bSensLOW_RAW;
 
 // HMI COMMAND HANDLING
 // This program was designed under the assumption that this MAIN may manage more than one tank.
-// As such, most of the IO is handled by the FB, and results passed in the next section.
+// As such, most of the IO reaction is handled by the FB, and results passed in the next section.
 
 // FB CALL
 Tank1(
@@ -46,12 +49,12 @@ Tank1(
 	bEStop		:= bEStopPressed,
 	bBusOK		:= bBusOK,
 	// These come OUT of the FB =>
-	bCmdValveIn		=> bValveInCMD,
-	bCmdValveOut 	=> bValveOutCMD,
-	bCmdPump		=> bPumpCMD,
+	bCMDValveIn		=> bValveInCMD,
+	bCMDValveOut 	=> bValveOutCMD,
+	bCMDPump		=> bPumpCMD,
 	eState			=> eTankState,
 	bFault			=> bTankFault,
-	eFaultCode		=> E_TankFault,
+	eFaultCode		=> eTankFaultCode,
 	// Refer to...
 	HMI			:= GVL_HMI.Tank1
 );
