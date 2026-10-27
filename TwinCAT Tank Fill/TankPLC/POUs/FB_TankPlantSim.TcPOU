@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_TankPlantSim" Id="{4367235a-03b2-4381-9158-f9ec5dd7d3bb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TankPlantSim
+VAR_INPUT
+    bValveIn          : BOOL;
+    bValveOut         : BOOL;
+    bPump             : BOOL;
+
+    tCycle            : TIME := T#10MS;   // must match the PlcTask cycle time
+
+    rFillRate         : REAL := 8.0;      // % per second, pump running AND inlet open
+    rDrainRate        : REAL := 6.0;      // % per second, outlet open (gravity)
+    rHighSP           : REAL := 85.0;     // level where SENS HIGH goes wet
+    rLowSP            : REAL := 15.0;     // level where SENS LOW goes wet
+
+    // Fault injection: set from the HMI, NOT passed in the call from MAIN
+    bFailHighDry      : BOOL;             // high sensor stuck reading dry
+    bFailLowDry       : BOOL;             // low sensor stuck reading dry
+    bResetLevel       : BOOL;             // empty the tank
+END_VAR
+VAR_OUTPUT
+    rLevel            : REAL;             // 0..100 %
+    bSensHIGH         : BOOL;
+    bSensLOW          : BOOL;
+END_VAR
+VAR
+    rDt               : REAL;             // cycle time in seconds
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Simulation FB
+
+rDt := TIME_TO_REAL(tCycle) / 1000.0;     // TIME_TO_REAL gives milliseconds
+
+IF bResetLevel THEN
+    rLevel := 0.0;
+END_IF;
+
+// Inflow: the pump feeds the inlet line. Liquid only moves if the inlet
+// valve is open too (pump against a closed valve = dead-head, no flow).
+IF bPump AND bValveIn THEN
+    rLevel := rLevel + rFillRate * rDt;
+END_IF;
+
+// Outflow: gravity drain through the outlet valve
+IF bValveOut THEN
+    rLevel := rLevel - rDrainRate * rDt;
+END_IF;
+
+rLevel := LIMIT(0.0, rLevel, 100.0);
+
+// Sensors, with optional injected failures
+bSensHIGH := (rLevel >= rHighSP) AND NOT bFailHighDry;
+bSensLOW  := (rLevel >= rLowSP)  AND NOT bFailLowDry;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
