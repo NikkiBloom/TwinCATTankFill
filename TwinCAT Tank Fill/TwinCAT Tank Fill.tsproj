@@ -10,7 +10,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{270C7E74-EC9D-4CD9-AEED-EADF027B8578}" Name="TankPLC" PrjFilePath="TankPLC\TankPLC.plcproj" TmcFilePath="TankPLC\TankPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{4D341523-7E16-478B-3283-E183F84C0D69}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{4D341523-7E16-478B-3283-E183F84C0D69}" TmcPath="TankPLC\TankPLC.tmc">
 					<Name>TankPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="2" AreaNo="1">
