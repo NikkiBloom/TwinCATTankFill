@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_TankSM" Id="{fccd4b83-08ed-42ee-a48d-bce3d96b8d5a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TankSM
+VAR_INPUT
+	bSensHIGH, bSensLOW	: BOOL;
+	bFaultClear			: BOOL;
+	bPumpReady			: BOOL; 
+	
+	tFillTimeout		: TIME;
+	
+	eSystemState		: E_SystemState;
+END_VAR
+VAR_OUTPUT
+	eTankState			: E_TankState;
+	
+	cmdOpenValveIn 		: BOOL;
+	cmdOpenValveOut		: BOOL;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// State Machine for the Tank
+
+IF eSystemState = 99 THEN
+	eTankState := 99;
+END_IF
+
+CASE eTankState OF
+	0://IDLE 
+		IF bSensLOW THEN // if low then fill
+			// kick on pump
+			IF bPumpReady THEN
+				cmdOpenValveIn := TRUE;
+				eTankState := 1;
+				END_IF
+		ELSIF bSensHIGH THEN // if high then drain
+			cmdOpenValveOut := TRUE;
+			eTankState := 3;
+		END_IF
+	1://FILLING
+		IF bSensHIGH THEN
+			cmdOpenValveIn := FALSE; // close in valve; full
+			eTankState := 2;
+		END_IF
+	2://FULL
+		IF NOT bSensHIGH THEN // if no longer high then trigger into idle
+			eTankState := 0;
+		END_IF
+	3://DRAINING
+		IF bSensLOW THEN
+			cmdOpenValveOut := FALSE; //close out valve; empty
+			eTankState := 2;
+		END_IF
+	99://FAULT
+		IF bFaultClear THEN
+			eTankState := 2;
+		END_IF
+END_CASE]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
