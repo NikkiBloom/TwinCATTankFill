@@ -7,12 +7,15 @@ VAR_INPUT
 	bEStop				: BOOL; //TRUE is pressed
 	bBusOK				: BOOL; //EtherCAT
 	
-	tFillTimeout		: TIME;
+	tFillTimeout         : TIME := T#120S;    // defaults apply if not passed
+    tDrainTimeout        : TIME := T#180S;
+    tSensorMismatchDelay : TIME := T#2S;
+
 END_VAR
 VAR_OUTPUT
-	bCmdValveIn			: BOOL;
-	bCmdValveOut		: BOOL;
-	bCmdPump			: BOOL;
+	bCMDValveIn			: BOOL;
+	bCMDValveOut		: BOOL;
+	bCMDPump			: BOOL;
 	eState				: E_TankState; 
 	bFault				: BOOL;
 	eFaultCode			: E_TankFault;
@@ -22,26 +25,52 @@ VAR_IN_OUT
 END_VAR
 VAR
 	_eState, _ePrevState	: E_TankState;
-	_bFaultLatched		: BOOL;
-	_eFaultCode			: E_TankFault;
+	_bFaultLatched			: BOOL;
+	_eFaultCode				: E_TankFault;
 	
 	_FillTimer, _DrainTimer, _MismatchTimer : TON;
-    _TrigStart, _TrigStop, _TrigReset       : R_TRIG;
+    _TrigStart, _TrigStop, _TrigReset       : R_TRIG; // a type that outputs a pulse lasting one call
 	
 	_bValveIn, _bValveOut, _bPump           : BOOL;
+	
+	_bPrevAutoMode       : BOOL;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// The State Machine
+      <ST><![CDATA[// FB_TankControl will run as a state machine cycling through idle, filling, full, draining, fault,
+// in modes safe, auto, and manual.
 
-// BODY
 // Edge-Detect Commands
-// Call Faults()
-// Select Mode
-	// Safe
-	// Auto
-	// Manual
-// Call Outputs()
-// Call HmiFeedback()
+// MOVE ME!!
+_TrigStart(CLK := HMI.bStart);
+_TrigStop(CLK := HMI.bStop);
+_TrigReset(CLK := HMI.bReset);
+
+// Faults() // TODO
+
+// MODES /////////////////////////////////////////////////////
+// IF no mode change since scan AND fault mode NOT latched
+IF HMI.bAutoMode <> _bPrevAutoMode AND NOT _bFaultLatched THEN
+	// THEN go idle
+    eState     := E_TankState.Idle;
+    _bValveIn  := FALSE;
+    _bValveOut := FALSE;
+    _bPump     := FALSE;
+END_IF;
+_bPrevAutoMode := HMI.bAutoMode; // save current mode
+
+IF _bFaultLatched THEN
+    //Safe();
+ELSIF HMI.bAutoMode THEN
+    //Auto();
+ELSE
+    Manual();
+END_IF;
+
+Outputs();
+//HmiFeedback();
+
+_ePrevState := _eState;
+/////////////////////////////////////////////////////////////
 
 // FAULTS
 
@@ -55,5 +84,32 @@ END_VAR]]></Declaration>
 
 // HMI FEEDBACK]]></ST>
     </Implementation>
+    <Method Name="Manual" Id="{f525ffa6-9ea1-419d-a9b8-7d16ddd7267b}">
+      <Declaration><![CDATA[METHOD Manual : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// When running a tank manually, simply pass raw HMI inputs
+_eState := E_TankState.Idle;
+// just push raw inputs
+_bValveIn := HMI.bPB_ValveIn;
+_bValveOut := HMI.bPB_ValveOut;
+_bPump := HMI.bPB_Pump;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Outputs" Id="{07ccee85-a7f7-45aa-8599-a87666cc079b}">
+      <Declaration><![CDATA[METHOD Outputs : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Sets commands
+bCmdValveIn  := _bValveIn AND NOT bSensHIGH AND NOT _bFaultLatched;          // no overfill
+bCmdValveOut := _bValveOut AND NOT _bFaultLatched;
+bCmdPump     := _bPump AND _bValveIn AND NOT bSensHIGH AND NOT _bFaultLatched; // no dead-head, no overfill
+
+eState := _eState;
+bFault := _bFaultLatched;]]></ST>
+      </Implementation>
+    </Method>
   </POU>
 </TcPlcObject>

@@ -28,14 +28,35 @@ VAR
 	bOutputsDisabled : BOOL; // practical IRL for maitinence lockout, but unused in this simulation
 	fbHeartbeat		: TON;
 	bHeartbeat		: BOOL;
+	
+	// ---- Simulation ----
+    fbSim            : FB_TankPlantSim;
+    bSimMode         : BOOL := TRUE;     // TRUE = no hardware, use fbSim
+    bSimEStop        : BOOL;             // HMI toggle: simulated e-stop pressed
+    bSimBusOK        : BOOL := TRUE;     // HMI toggle: simulated bus health
+	// Final outputs after plant-level overrides 
+    bOutValveIn      : BOOL;
+    bOutValveOut     : BOOL;
+    bOutPump         : BOOL;
+
+
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Main will primarily call function blocks in order
 
 // Pull in I/O Inputs from GVL
-bEStopPressed 	:= NOT GVL_IO.bEStop_RAW; // invert input;
-bSensHIGH		:= GVL_IO.bSensHigh_RAW;
-bSensLOW		:= GVL_IO.bSensLOW_RAW;
+IF bSimMode THEN
+    bSensHIGH     := fbSim.bSensHIGH;
+    bSensLOW      := fbSim.bSensLOW;
+    bEStopPressed := bSimEStop;
+    bBusOK        := bSimBusOK;
+ELSE
+    bEStopPressed := NOT GVL_IO.bEStop_RAW; 
+    bSensHIGH     := GVL_IO.bSensHigh_RAW;    
+    bSensLOW      := GVL_IO.bSensLow_RAW;
+    // bBusOK
+END_IF;
+
 
 // HMI COMMAND HANDLING
 // This program was designed under the assumption that this MAIN may manage more than one tank.
@@ -55,7 +76,7 @@ Tank1(
 	eState			=> eTankState,
 	bFault			=> bTankFault,
 	eFaultCode		=> eTankFaultCode,
-	// Refer to...
+	// VAR_IN_OUT
 	HMI			:= GVL_HMI.Tank1
 );
 
@@ -63,14 +84,33 @@ Tank1(
 // Plant-level overrides such as E-Stop presses, bus fault, etc. 
 // For this exercise, it's not simulated but still here.
 IF bOutputsDisabled OR NOT bBusOK OR bEStopPressed THEN // if something wrong, soft stop
-    GVL_IO.bValveIn  := FALSE;
+    bOutValveIn  := FALSE;
+    bOutValveOut := FALSE;
+    bPump     := FALSE;
+ELSE 
+    bOutValveIn  := bValveInCMD;
+    bOutValveOut := bValveOutCMD;
+    bOutPump     := bPumpCMD;
+END_IF;
+
+IF bSimMode THEN
+    fbSim(
+        bValveIn  := bOutValveIn,
+        bValveOut := bOutValveOut,
+        bPump     := bOutPump,
+        tCycle    := T#10MS             
+    );
+    GVL_HMI.Tank1.rLevel := fbSim.rLevel;
+
+    GVL_IO.bValveIn  := FALSE;          
     GVL_IO.bValveOut := FALSE;
     GVL_IO.bPump     := FALSE;
-ELSE 
-    GVL_IO.bValveIn  := bValveInCmd;
-    GVL_IO.bValveOut := bValveOutCmd;
-    GVL_IO.bPump     := bPumpCmd;
+ELSE
+    GVL_IO.bValveIn  := bOutValveIn;
+    GVL_IO.bValveOut := bOutValveOut;
+    GVL_IO.bPump     := bOutPump;
 END_IF;
+
 
 // STATUS AND DIAGNOSTICS
 // Things like heartbeat, warning flags, etc.

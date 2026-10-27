@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"23"</v>
+          <v n="UniqueIdGenerator">"35"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -1730,8 +1730,8 @@
                       <v n="Id">4034249374L</v>
                       <l n="Value" t="ArrayList" cet="NamedStyleColor">
                         <o>
-                          <v n="Color">-16711936</v>
-                          <v n="CanonicalName">"Element-Bar-GraphColor"</v>
+                          <v n="Color">-16776961</v>
+                          <v n="CanonicalName">"Blue"</v>
                         </o>
                       </l>
                     </o>
@@ -1773,7 +1773,7 @@
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
-                      <v n="Value" t="Int16">50</v>
+                      <v n="Value" t="Int16">138</v>
                     </o>
                     <o>
                       <v n="Id">2134141914L</v>
@@ -2147,7 +2147,7 @@
                     </o>
                     <o>
                       <v n="Id">550940142L</v>
-                      <v n="Value">295</v>
+                      <v n="Value">339</v>
                     </o>
                     <o>
                       <v n="Id">1473355128L</v>
@@ -2763,11 +2763,11 @@
                     </o>
                     <o>
                       <v n="Id">1649127785L</v>
-                      <v n="Value">318</v>
+                      <v n="Value">389</v>
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">81</v>
+                      <v n="Value">106</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -2783,11 +2783,11 @@
                     </o>
                     <o>
                       <v n="Id">550940142L</v>
-                      <v n="Value">333</v>
+                      <v n="Value">404</v>
                     </o>
                     <o>
                       <v n="Id">1473355128L</v>
-                      <v n="Value">96</v>
+                      <v n="Value">121</v>
                     </o>
                     <o>
                       <v n="Id">493260384L</v>
@@ -2878,11 +2878,11 @@
                     </o>
                     <o>
                       <v n="Id">1649127785L</v>
-                      <v n="Value">318</v>
+                      <v n="Value">388</v>
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">274</v>
+                      <v n="Value">250</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -2898,11 +2898,11 @@
                     </o>
                     <o>
                       <v n="Id">550940142L</v>
-                      <v n="Value">333</v>
+                      <v n="Value">403</v>
                     </o>
                     <o>
                       <v n="Id">1473355128L</v>
-                      <v n="Value">289</v>
+                      <v n="Value">265</v>
                     </o>
                     <o>
                       <v n="Id">493260384L</v>
@@ -3384,7 +3384,36 @@
                 <n n="TabOrder" />
               </o>
               <o>
-                <a n="ConfiguredComplexInputs" et="ComplexInput" />
+                <a n="ConfiguredComplexInputs" cet="ComplexInput">
+                  <o>
+                    <n n="DescriptionTree" />
+                    <o n="VisualElemMemberList" t="VisualElemMemberList">
+                      <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
+                        <o>
+                          <v n="Id">1186196937L</v>
+                          <v n="Value">"GVL_HMI.Tank1.bPB_Pump"</v>
+                        </o>
+                      </l>
+                    </o>
+                    <v n="SignatureName">"Visu_TapInput"</v>
+                    <v n="Name">"Tap"</v>
+                    <v n="Description">"Configure the tapping of a Boolean variable"</v>
+                  </o>
+                  <o>
+                    <n n="DescriptionTree" />
+                    <o n="VisualElemMemberList" t="VisualElemMemberList">
+                      <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
+                        <o>
+                          <v n="Id">1186196937L</v>
+                          <v n="Value">"GVL_HMI.Tank1.bPB_Pump"</v>
+                        </o>
+                      </l>
+                    </o>
+                    <v n="SignatureName">"Visu_ToggleInput"</v>
+                    <v n="Name">"Toggle"</v>
+                    <v n="Description">"Configure the toggling of a Boolean variable"</v>
+                  </o>
+                </a>
                 <l n="Elements" t="ArrayList" />
                 <n n="VisualElementDescription" />
                 <o n="VisualElemMemberList" t="VisualElemMemberList">
@@ -3436,7 +3465,7 @@
                     </o>
                     <o>
                       <v n="Id">1647042231L</v>
-                      <v n="Value">"GVL_IO.bPump"</v>
+                      <v n="Value">""</v>
                     </o>
                     <o>
                       <v n="Id">2812299069L</v>
@@ -3541,6 +3570,10 @@
                       <v n="Value">false</v>
                     </o>
                     <o>
+                      <v n="Id">2496894244L</v>
+                      <v n="Value">"GVL_HMI.Tank1.bAutoMode"</v>
+                    </o>
+                    <o>
                       <v n="Id">823443203L</v>
                       <v n="Value">"620"</v>
                     </o>
@@ -3565,7 +3598,22 @@
                 <n n="TabOrder" />
               </o>
               <o>
-                <a n="ConfiguredComplexInputs" et="ComplexInput" />
+                <a n="ConfiguredComplexInputs" cet="ComplexInput">
+                  <o>
+                    <n n="DescriptionTree" />
+                    <o n="VisualElemMemberList" t="VisualElemMemberList">
+                      <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
+                        <o>
+                          <v n="Id">1186196937L</v>
+                          <v n="Value">"GVL_HMI.Tank1.bPB_ValveIn"</v>
+                        </o>
+                      </l>
+                    </o>
+                    <v n="SignatureName">"Visu_ToggleInput"</v>
+                    <v n="Name">"Toggle"</v>
+                    <v n="Description">"Configure the toggling of a Boolean variable"</v>
+                  </o>
+                </a>
                 <l n="Elements" t="ArrayList" />
                 <n n="VisualElementDescription" />
                 <o n="VisualElemMemberList" t="VisualElemMemberList">
@@ -3617,7 +3665,7 @@
                     </o>
                     <o>
                       <v n="Id">1647042231L</v>
-                      <v n="Value">"GVL_IO.bValveIn"</v>
+                      <v n="Value">""</v>
                     </o>
                     <o>
                       <v n="Id">2812299069L</v>
@@ -3750,7 +3798,22 @@
                 <n n="TabOrder" />
               </o>
               <o>
-                <a n="ConfiguredComplexInputs" et="ComplexInput" />
+                <a n="ConfiguredComplexInputs" cet="ComplexInput">
+                  <o>
+                    <n n="DescriptionTree" />
+                    <o n="VisualElemMemberList" t="VisualElemMemberList">
+                      <l n="VisualElemMemberList" t="VisualElemMemberCollection" cet="VisualElemMember">
+                        <o>
+                          <v n="Id">1186196937L</v>
+                          <v n="Value">"GVL_HMI.Tank1.bPB_ValveOut"</v>
+                        </o>
+                      </l>
+                    </o>
+                    <v n="SignatureName">"Visu_ToggleInput"</v>
+                    <v n="Name">"Toggle"</v>
+                    <v n="Description">"Configure the toggling of a Boolean variable"</v>
+                  </o>
+                </a>
                 <l n="Elements" t="ArrayList" />
                 <n n="VisualElementDescription" />
                 <o n="VisualElemMemberList" t="VisualElemMemberList">
@@ -3802,7 +3865,7 @@
                     </o>
                     <o>
                       <v n="Id">1647042231L</v>
-                      <v n="Value">"GVL_IO.bValveOut"</v>
+                      <v n="Value">""</v>
                     </o>
                     <o>
                       <v n="Id">2812299069L</v>

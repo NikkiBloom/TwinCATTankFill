@@ -6,9 +6,9 @@
 TYPE E_TankState :
 (
 	Idle	:= 0,
-	Filling := 1,
-	Full	:= 2,
-	Draining := 3,
+	Filling := 10,
+	Full	:= 20,
+	Draining := 30,
 	Fault	:= 99
 ) INT;
 END_TYPE
