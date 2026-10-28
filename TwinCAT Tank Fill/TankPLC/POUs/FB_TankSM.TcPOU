@@ -5,59 +5,118 @@
 VAR_INPUT
 	bSensHIGH, bSensLOW	: BOOL;
 	bFaultClear			: BOOL;
-	bPumpReady			: BOOL; 
+	bBusOK				: BOOL;
+	bTankFault				: BOOL;
 	
-	tFillTimeout		: TIME;
-	
+	eTankFaultCode		: E_TankFault;
 	eSystemState		: E_SystemState;
+	
+	// passed in from TankCrontrol to go to Main
+	bValveIn    : BOOL;
+    bValveOut   : BOOL;
+    bPump       : BOOL;
 END_VAR
 VAR_OUTPUT
-	eTankState			: E_TankState;
+	eTankState				: E_TankState;
 	
-	cmdOpenValveIn 		: BOOL;
-	cmdOpenValveOut		: BOOL;
+	// pass from TankControl to Main
+	bOutValveIn				: BOOL;
+	bOutValveOut			: BOOL;
+	bOutPump				: BOOL;
+END_VAR
+VAR_IN_OUT
+	bAutoMode			: BOOL;
 END_VAR
 VAR
+	TankCTRL	: FB_TankControl;
+	
+    tonEmptyDelay     : TON;
+	tonPumpStartDelay : TON;
+	tonStayFull		  : TON;
+	tEmptyDelay       : TIME := T#2S;
+	tPumpStartDelay   : TIME := T#3S;
+	tStayFullTime	  : TIME := T#3S;
+	
+	bcmdOpenValveIn 		: BOOL;
+	bcmdOpenValveOut		: BOOL;
+	bcmdPumpOn				: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[// State Machine for the Tank
 
-IF eSystemState = 99 THEN
+IF NOT bAutoMode THEN
+	eTankState := 40;
+END_IF
+IF eSystemState = 99 OR bTankFault THEN
 	eTankState := 99;
 END_IF
 
+tonEmptyDelay(IN := (eTankState = 35), PT := tEmptyDelay);
+tonPumpStartDelay(IN := (eTankState = 10), PT := tPumpStartDelay);
+tonStayFull(IN := (eTankState = 20), PT := tStayFullTime);
+
 CASE eTankState OF
 	0://IDLE 
-		IF bSensLOW THEN // if low then fill
-			// kick on pump
-			IF bPumpReady THEN
-				cmdOpenValveIn := TRUE;
-				eTankState := 1;
-				END_IF
-		ELSIF bSensHIGH THEN // if high then drain
-			cmdOpenValveOut := TRUE;
-			eTankState := 3;
+		IF NOT bSensHIGH AND NOT bSensLOW THEN // Empty
+			eTankState := 35;
+		ELSIF bSensLOW THEN //If between sensors then go to filling
+			eTankState := 10;
+		ELSE // if high then drain
+			eTankState := 30;
 		END_IF
-	1://FILLING
-		IF bSensHIGH THEN
-			cmdOpenValveIn := FALSE; // close in valve; full
-			eTankState := 2;
+	10://FILLING
+	bcmdOpenValveIn := TRUE;
+		bcmdPumpOn := TRUE;
+		 IF tonPumpStartDelay.Q AND bSensHIGH THEN
+			bcmdOpenValveIn := FALSE; // close in valve; full
+			eTankState := 20;
 		END_IF
-	2://FULL
-		IF NOT bSensHIGH THEN // if no longer high then trigger into idle
+	20://FULL
+		IF tonStayFull.Q THEN
+			eTankState := 30; // drain after 3s
+		ELSIF NOT bSensHIGH THEN // if no longer high then trigger into idle
+			bcmdPumpOn := FALSE;
 			eTankState := 0;
 		END_IF
-	3://DRAINING
-		IF bSensLOW THEN
-			cmdOpenValveOut := FALSE; //close out valve; empty
-			eTankState := 2;
+	30: // DRAINING
+		bcmdOpenValveOut := TRUE;
+        IF NOT bSensLOW THEN
+            bcmdOpenValveOut := FALSE;
+            eTankState := 35;
+        END_IF
+    35: // EMPTY - hold 2 s before starting to fill
+        IF tonEmptyDelay.Q THEN
+            eTankState := 10;
+        END_IF
+	40://MANUAL
+		IF bAutoMode THEN
+			eTankState := 0;
 		END_IF
 	99://FAULT
+		bcmdPumpOn := FALSE;
 		IF bFaultClear THEN
-			eTankState := 2;
+			eTankState := 0;
 		END_IF
-END_CASE]]></ST>
+END_CASE
+
+TankCTRL(
+    // Commands from the state machine
+    cmdOpenValveIn  := bcmdOpenValveIn,
+    cmdOpenValveOut := bcmdOpenValveOut,
+    cmdPumpOn       := bcmdPumpOn,
+    bAutoMode       := bAutoMode,
+
+    // Status
+    bFault          => bTankFault,
+    eFaultCode      => eTankFaultCode,
+    bBusOK          => bBusOK,
+
+    // Final outputs, passed straight through to MAIN
+    bValveIn        => bOutValveIn,
+    bValveOut       => bOutValveOut,
+    bPump           => bOutPump
+);]]></ST>
     </Implementation>
   </POU>
 </TcPlcObject>

@@ -4,7 +4,7 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	// Create instance of FB
-	Tank1 : FB_TankControl;
+	Tank1SM : FB_TankSM;
 	
 	// Internal Bools to handle I/O inputs
 	bEStopPressed 	: BOOL; // TRUE = PRESSED (inverted from raw)
@@ -20,9 +20,11 @@ VAR
 	bValveOutCMD	: BOOL;
 	bPumpCMD		: BOOL;
 	bTankFault		: BOOL;
+	bAutoMode		: BOOL;
 	
 	eTankState		: E_TankState;
 	eTankFaultCode  : E_TankFault;
+	eSystemState	: E_SystemState;
 	
 	// Plant-level
 	bOutputsDisabled : BOOL; // practical IRL for maitinence lockout, but unused in this simulation
@@ -44,40 +46,36 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[// Main will primarily call function blocks in order
 
-// Pull in I/O Inputs from GVL
-IF bSimMode THEN
-    bSensHIGH     := fbSim.bSensHIGH;
-    bSensLOW      := fbSim.bSensLOW;
-    bEStopPressed := bSimEStop;
-    bBusOK        := bSimBusOK;
-ELSE
-    bEStopPressed := NOT GVL_IO.bEStop_RAW; 
-    bSensHIGH     := GVL_IO.bSensHigh_RAW;    
-    bSensLOW      := GVL_IO.bSensLow_RAW;
-    // bBusOK
-END_IF;
+// Pull in I/O Inputs from GVL (or in this case, the SIM)
+bSensHIGH     := fbSim.bSensHIGH;
+bSensLOW      := fbSim.bSensLOW;
+bEStopPressed := bSimEStop;
+bAutoMode     := GVL_HMI.Tank1.bAutoMode; 
+(* This is what it would look like as GVL *)(*    
+bEStopPressed := NOT GVL_IO.bEStop_RAW; 
+bSensHIGH     := GVL_IO.bSensHigh_RAW;    
+bSensLOW      := GVL_IO.bSensLow_RAW;
+*)
 
 
 // HMI COMMAND HANDLING
 // This program was designed under the assumption that this MAIN may manage more than one tank.
-// As such, most of the IO reaction is handled by the FB, and results passed in the next section.
+// As such, most of the IO reaction is handled by the FB's, and results passed in the next section.
 
-// FB CALL
-Tank1(
+// FB CALL sysSM -> tankSM -> pumpSM -> simSM
+Tank1SM(
 	// These go INTO the FB :=
 	bSensHIGH	:= bSensHIGH,
 	bSensLOW	:= bSensLOW,
-	bEStop		:= bEStopPressed,
-	bBusOK		:= bBusOK,
+	eSystemState := eSystemState,
+	
 	// These come OUT of the FB =>
-	bCMDValveIn		=> bValveInCMD,
-	bCMDValveOut 	=> bValveOutCMD,
-	bCMDPump		=> bPumpCMD,
-	eState			=> eTankState,
-	bFault			=> bTankFault,
-	eFaultCode		=> eTankFaultCode,
+	eTankState => eTankState,
+	bOutValveIn	=> bValveInCMD,
+	bOutValveOut => bValveOutCMD,
+	bOutPump => bPumpCMD,
 	// VAR_IN_OUT
-	HMI			:= GVL_HMI.Tank1
+	bAutoMode	:= bAutoMode
 );
 
 // OUTPUT MAPING
@@ -86,7 +84,7 @@ Tank1(
 IF bOutputsDisabled OR NOT bBusOK OR bEStopPressed THEN // if something wrong, soft stop
     bOutValveIn  := FALSE;
     bOutValveOut := FALSE;
-    bPump     := FALSE;
+    bOutPump     := FALSE;
 ELSE 
     bOutValveIn  := bValveInCMD;
     bOutValveOut := bValveOutCMD;

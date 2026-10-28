@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1">
-  <DUT Name="SystemState" Id="{814ed138-9d9b-47bc-a7e4-af06d745d16d}">
+  <DUT Name="E_SystemState" Id="{814ed138-9d9b-47bc-a7e4-af06d745d16d}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'strict'}
 TYPE E_SystemState :
